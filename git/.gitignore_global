@@ -1,0 +1,11 @@
+.idea/
+.idea/*
+.direnv/
+.DS_Store
+.jira-url
+.jira-prefix
+.node-version
+.ssh/
+.php-version
+.python-version
+.aider.*
