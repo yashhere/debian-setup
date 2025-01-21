@@ -18,9 +18,7 @@ alias pu="ps aux | grep -v grep | grep"
 alias rs="exec $SHELL"
 alias pbpaste="xclip -selection clipboard -o"
 
-set -gx PATH $PATH /usr/local/go/bin
-set -gx GOPATH $HOME/go
-set -gx PATH $PATH $GOPATH/bin
+set -gx PATH $PATH $GOBIN
 
 # Fabric
 # Loop through all files in the ~/.config/fabric/patterns directory
@@ -39,4 +37,3 @@ function yt
 end
 set -gx PATH $PATH $HOME/.local/bin
 set -gx PATH $PATH $HOME/fabric
-set -gx PATH $HOME/.npm-global/bin $PATH
