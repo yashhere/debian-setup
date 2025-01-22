@@ -1,0 +1,21 @@
+# Contents of .stow-local-ignore
+# Ignore everything by default
+.*
+
+# Explicitly allow specific files and directories
+!.config
+!.config/fish
+!.config/fish/config.fish
+!.config/fish/conf.d
+!.config/fish/conf.d/*.fish
+!.config/fish/functions
+!.config/fish/functions/*.fish
+
+# Ignore specific plugin/generated directories
+completions
+fish_variables
+generated_completions
+conf.d/fisher.fish
+functions/_*.fish
+functions/fisher.fish
+functions/fzf_*.fish

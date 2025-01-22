@@ -98,7 +98,6 @@ main() {
         "python"        # Python development environment (pyenv, pipx)
         "nodejs"        # Node.js development environment (nvm)
         "golang"        # Go development environment
-        "ai"            # terminal-based ai tools
         # "gnome"         # GNOME configuration and extensions
         # "dotfiles"      # GNU Stow dotfiles setup
     )

@@ -1,0 +1,14 @@
+## Specify the model to use for the main chat
+model: gemini/gemini-exp-1206
+
+## Enable caching of prompts (default: False)
+cache-prompts: true
+
+## Enable/disable auto commit of LLM changes (default: True)
+auto-commits: false
+
+## Enable/disable commits when repo is found dirty (default: True)
+dirty-commits: false
+
+## Permanently disable analytics
+analytics-disable: true

@@ -4,6 +4,138 @@
 ASDF_VERSION="v0.15.0"
 NEOVIM_VERSION="0.9.4"
 
+INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/bin}"
+GITHUB_API_URL="https://api.github.com"
+ARCH="${ARCH:-x86_64}"
+OS="${OS:-linux}"
+
+install_from_github() {
+    local owner="$1"
+    local repo="$2"
+    local binary="$3"
+    local version="${4:-latest}"
+    local arch="${5:-x86_64}"
+
+    [ -z "$owner" ] || [ -z "$repo" ] || [ -z "$binary" ] && {
+        echo "Usage: install_from_github OWNER REPO BINARY [VERSION]"
+        return 1
+    }
+
+    command -v jq >/dev/null 2>&1 || { echo "jq is required"; return 1; }
+    mkdir -p "$INSTALL_DIR"
+
+    local api_url="$GITHUB_API_URL/repos/$owner/$repo/releases"
+    [ "$version" = "latest" ] && api_url="$api_url/latest" || api_url="$api_url/tags/$version"
+
+    local release_data=$(curl -s "$api_url")
+    [ $? -ne 0 ] && { echo "Failed to fetch release data"; return 1; }
+
+    local download_url=$(echo "$release_data" | jq -r ".assets[] | select(.browser_download_url | contains(\"$arch\") and contains(\"$OS\")) | .browser_download_url" | head -n1)
+    [ -z "$download_url" ] && { echo "No matching binary found"; return 1; }
+
+    local temp_dir=$(mktemp -d)
+    local archive="$temp_dir/archive"
+
+    echo "Downloading from $download_url..."
+    curl -L "$download_url" -o "$archive" || {
+        rm -rf "$temp_dir"
+        echo "Download failed"
+        return 1
+    }
+
+    case "$download_url" in
+        *.tar.gz|*.tgz)
+            tar xzf "$archive" -C "$temp_dir"
+            ;;
+        *.tar)
+            tar xf "$archive" -C "$temp_dir"
+            ;;
+        *.zip)
+            unzip -q "$archive" -d "$temp_dir"
+            ;;
+        *)
+            # Direct binary download
+            mv "$archive" "$temp_dir/$binary"
+            ;;
+    esac
+
+    # Find and move the binary
+    if [ -f "$temp_dir/$binary" ]; then
+        mv "$temp_dir/$binary" "$INSTALL_DIR/$binary"
+    else
+        find "$temp_dir" -type f -name "$binary" -exec mv {} "$INSTALL_DIR/$binary" \;
+    fi
+
+    [ -f "$INSTALL_DIR/$binary" ] || {
+        echo "Binary not found in downloaded package"
+        rm -rf "$temp_dir"
+        return 1
+    }
+
+    chmod +x "$INSTALL_DIR/$binary"
+    rm -rf "$temp_dir"
+    echo "Installed $binary to $INSTALL_DIR/$binary"
+}
+
+install_from_url() {
+    local url="$1"
+    local binary="$2"
+
+    [ -z "$url" ] || [ -z "$binary" ] && {
+        echo "Usage: install_from_url URL BINARY"
+        return 1
+    }
+
+    mkdir -p "$INSTALL_DIR"
+    local temp_file=$(mktemp)
+
+    curl -L "$url" -o "$temp_file" || { echo "Download failed"; rm "$temp_file"; return 1; }
+    chmod +x "$temp_file"
+    mv "$temp_file" "$INSTALL_DIR/$binary"
+    echo "Installed $binary to $INSTALL_DIR/$binary"
+}
+
+verify_checksum() {
+    local file="$1"
+    local expected="$2"
+    local algo="${3:-sha256}"
+
+    case "$algo" in
+        sha256) echo "$expected $file" | sha256sum -c ;;
+        sha512) echo "$expected $file" | sha512sum -c ;;
+        md5) echo "$expected $file" | md5sum -c ;;
+        *) echo "Unsupported hash algorithm"; return 1 ;;
+    esac
+}
+
+# Function to install Playwright via npm
+install_playwright_npm() {
+    echo "Installing Playwright via npm..."
+    npm install -g playwright
+
+    echo "Installing browsers for Playwright..."
+    npx playwright install --with-deps chromium
+}
+
+# Function to install aider-chat
+install_aider_chat() {
+    if ! command -v aider &> /dev/null; then
+        pip install aider-install
+        aider-install
+    else
+        echo "aider-chat is already installed."
+    fi
+
+    install_playwright_npm
+}
+
+# Function to install danielmiessler/fabric
+install_fabric() {
+    if ! command -v fabric &> /dev/null; then
+        install_from_github "danielmiessler" "fabric" "fabric" "latest" "amd64"
+    fi
+}
+
 setup_asdf() {
     if ! command -v asdf &> /dev/null; then
         git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch ${ASDF_VERSION}
@@ -32,47 +164,6 @@ EOF
         fish -c 'asdf install golang 1.23.5'
         fish -c 'asdf global golang 1.23.5'
     fi
-}
-
-# Function to configure VS Code settings
-configure_vscode_settings() {
-    local settings_file="$HOME/.config/Code/User/settings.json"
-    local settings='
-    {
-        "editor.tabSize": 4,
-        "editor.insertSpaces": true,
-        "editor.wordWrap": "on",
-        "files.autoSave": "afterDelay",
-        "files.autoSaveDelay": 1000,
-        "editor.fontSize": 14,
-        "editor.fontLigatures": true,
-        "terminal.integrated.fontSize": 14,
-        "eslint.enable": true,
-        "eslint.autoFixOnSave": true,
-        "prettier.singleQuote": true,
-        "prettier.trailingComma": "es5",
-        "prettier.semi": true,
-        "python.linting.enabled": true,
-        "python.linting.pylintEnabled": true,
-        "python.linting.flake8Enabled": true,
-        "python.formatting.provider": "black",
-        "go.useLanguageServer": true,
-        "go.formatTool": "goimports",
-        "typescript.updateImportsOnFileMove.enabled": "always",
-        "javascript.updateImportsOnFileMove.enabled": "always",
-        "html.format.enable": true,
-        "css.validate": true,
-        "docker.languageserver": {
-            "enabled": true
-        }
-    }'
-
-    echo "Configuring VS Code settings..."
-    if [ ! -f "$settings_file" ]; then
-        mkdir -p "$(dirname "$settings_file")"
-    fi
-    echo "$settings" > "$settings_file"
-    echo "VS Code settings configured successfully."
 }
 
 # Function to install VS Code extensions
@@ -118,11 +209,12 @@ install_vscode_extensions() {
 
 # Function to install VS Code
 install_vscode() {
-    if ! command_exists code; then
+    if ! command -v code &> /dev/null; then
         echo "Installing Visual Studio Code..."
         wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
         sudo install -o root -g root -m 644 packages.microsoft.gpg /usr/share/keyrings/
         sudo sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
+        rm packages.microsoft.gpg
         sudo apt update
         sudo apt install -y code
         echo "Visual Studio Code installed successfully."
@@ -137,9 +229,6 @@ setup_vscode() {
 
     # Install VS Code extensions
     install_vscode_extensions
-
-    # Configure VS Code settings
-    configure_vscode_settings
 }
 
 setup_neovim() {
@@ -153,13 +242,31 @@ setup_neovim() {
     fi
 }
 
+install_aichat() {
+    # Install latest aichat CLI
+    if ! command -v aichat &> /dev/null; then
+        install_from_github "sigoden" "aichat" "aichat"
+    fi
+}
+
+setup_ai() {
+    # Install aider
+    install_aider_chat
+
+    # Install fabric
+    install_fabric
+
+    # install aichat
+    install_aichat
+}
+
 setup_tools() {
     log "Starting common tools setup..."
 
     setup_asdf
     setup_vscode
     setup_neovim
-    # setup_git
+    setup_ai
 
     log "Common tools setup completed successfully!"
 }
