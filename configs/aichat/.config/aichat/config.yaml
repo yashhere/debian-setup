@@ -1,0 +1,62 @@
+# see https://github.com/sigoden/aichat/blob/main/config.example.yaml
+
+model: gemini:gemini-exp-1206
+clients:
+- type: gemini
+highlight: true                 # Controls syntax highlighting
+light_theme: true               # Activates a light color theme when true. env: AICHAT_LIGHT_THEME
+user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"
+save_shell_history: true        # Whether to save shell execution command to the history file
+
+# behaviour
+stream: true                     # Controls whether to use the stream-style API.
+save: true                       # Indicates whether to persist the message
+keybindings: vi               # Choose keybinding style (emacs, vi)
+editor: null                     # Specifies the command used to edit input buffer or session.yaml. env: EDITOR
+wrap: no                         # Controls text wrapping (no, auto, <max-width>)
+wrap_code: false                 # Enables or disables wrapping of code blocks
+
+# function calling
+# Visit https://github.com/sigoden/llm-functions for setup instructions
+function_calling: true           # Enables or disables function calling (Globally).
+mapping_tools:                   # Alias for a tool or toolset
+  fs: 'fs_cat,fs_ls,fs_mkdir,fs_rm,fs_write'
+use_tools: null                  # Which tools to use by default
+
+# session
+# Controls the persistence of the session. if true, auto save; if false, not save; if null, asking the user
+save_session: true
+# Compress session when token count reaches or exceeds this threshold
+compress_threshold: 4000
+# Text prompt used for creating a concise summary of session message
+# summarize_prompt: '...'
+# Text prompt used for including the summary of the entire session
+# summary_prompt: '...'
+
+# ---- RAG ----
+# See [RAG-Guide](https://github.com/sigoden/aichat/wiki/RAG-Guide) for more details.
+rag_embedding_model: null        # Specifies the embedding model used for context retrieval
+rag_reranker_model: null         # Specifies the reranker model used for sorting retrieved documents
+rag_top_k: 5                     # Specifies the number of documents to retrieve for answering queries
+rag_chunk_size: null             # Defines the size of chunks for document processing in characters
+rag_chunk_overlap: null          # Defines the overlap between chunks
+# Defines the query structure using variables like __CONTEXT__ and __INPUT__ to tailor searches to specific needs
+rag_template: |
+  Answer the query based on the context while respecting the rules. (user query, some textual context and rules, all inside xml tags)
+
+  <context>
+  __CONTEXT__
+  </context>
+
+  <rules>
+  - If you don't know, just say so.
+  - If you are not sure, ask for clarification.
+  - Answer in the same language as the user query.
+  - If the context appears unreadable or of poor quality, tell the user then answer as best as you can.
+  - If the answer is not in the context but you think you know the answer, explain that to the user then answer with your own knowledge.
+  - Answer directly and without using xml tags.
+  </rules>
+
+  <user_query>
+  __INPUT__
+  </user_query>

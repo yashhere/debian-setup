@@ -46,6 +46,8 @@ setup_base() {
         xclip
         fzf
         ethtool
+        poppler-utils       # pdftotext
+        pandoc
     )
 
     log "Installing base packages..."
@@ -216,6 +218,12 @@ EOF
     # Setup authorized_keys file with proper permissions if it doesn't exist
     touch ~/.ssh/authorized_keys
     chmod 600 ~/.ssh/authorized_keys
+
+    # Disable mbox globally
+    echo "unset MAILCHECK" | sudo tee /etc/profile.d/disable_mbox.sh
+
+    # Disable mbox messages
+    touch ~/.hushlogin
 
     log "Base system configuration completed"
 

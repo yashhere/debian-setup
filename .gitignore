@@ -4,3 +4,4 @@
 **/aider/.aider/caches
 *.log
 *.env
+_*.fish

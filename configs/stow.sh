@@ -4,7 +4,7 @@
 DOTFILES_DIR="$HOME/configs"
 
 # List of packages to stow
-PACKAGES="fish git vim aider ssh"
+PACKAGES="fish git vim aider aichat ssh nvim"
 
 # Loop through each package and stow it
 for package in $PACKAGES; do

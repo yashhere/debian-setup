@@ -2,6 +2,13 @@ if status is-interactive
     # Commands to run in interactive sessions can go here
 end
 
+set -g fish_greeting
+
+# Install Fisher if it's not installed
+if not functions -q fisher && status is-interactive
+    curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+end
+
 # Preferred editor for local and remote sessions
 if test -n "$SSH_CONNECTION"
     set -x EDITOR vim
@@ -11,18 +18,9 @@ else
     set -x GUIEDITOR code
 end
 
-# Aliases
-alias rmdot="rm -rf .[!.]*"
-alias sudoedit="sudo $EDITOR"
-alias pu="ps aux | grep -v grep | grep"
-alias rs="exec $SHELL"
-alias pbpaste="xclip -selection clipboard -o"
-
-if type -q aider
-    alias aider="aider --env-file $HOME/.aider.env"
-end
-
-set -gx PATH $PATH $GOBIN
+# Load Vscode shell integration
+string match -q "$TERM_PROGRAM" vscode
+and . (code --locate-shell-integration-path fish)
 
 # Fabric
 # Loop through all files in the ~/.config/fabric/patterns directory

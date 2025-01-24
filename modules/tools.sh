@@ -126,7 +126,9 @@ install_aider_chat() {
         echo "aider-chat is already installed."
     fi
 
-    install_playwright_npm
+    if ! command -v playwright &> /dev/null; then
+        install_playwright_npm
+    fi
 }
 
 # Function to install danielmiessler/fabric
@@ -234,11 +236,20 @@ setup_vscode() {
 setup_neovim() {
     if ! command -v nvim &> /dev/null; then
         log "Installing Neovim..."
-        sudo apt-get install -y neovim
 
-        # Install vim-plug
-        sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-            https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+        sudo apt remove neovim
+        sudo apt install ninja-build gettext cmake unzip curl
+
+        # Compile and install Neovim
+        git clone https://github.com/neovim/neovim /tmp/neovim
+        cd /tmp/neovim
+        make CMAKE_BUILD_TYPE=RelWithDebInfo
+        cd build && cpack -G DEB
+        sudo dpkg -i --force-overwrite nvim-linux64.deb
+
+        # Clean up
+        cd
+        rm -rf /tmp/neovim
     fi
 }
 
@@ -260,6 +271,13 @@ setup_ai() {
     install_aichat
 }
 
+setup_terminal_tools() {
+    # superfile
+    if ! command -v superfile &> /dev/null; then
+        install_from_github "yorukot" "superfile" "spf" "latest" "amd64"
+    fi
+}
+
 setup_tools() {
     log "Starting common tools setup..."
 
@@ -267,6 +285,7 @@ setup_tools() {
     setup_vscode
     setup_neovim
     setup_ai
+    setup_terminal_tools
 
     log "Common tools setup completed successfully!"
 }

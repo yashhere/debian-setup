@@ -24,7 +24,8 @@
 	dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d";
 
 [push]
-	default = simple
+	autoSetupRemote = true
+  	default = current
 
 [pull]
 	ff = only
@@ -35,6 +36,14 @@
 	pager = less -x4
 	excludesfile = ~/.gitignore_global
 	ignorecase = false
+	autocrlf = false
+	preloadindex = true
+	fscache = true
+	editor = nvim
+	symlinks = true
+
+[log]
+	decorate = short
 
 [credential]
 	helper = manager
@@ -55,10 +64,8 @@
 	autosquash = true
 
 [color]
-	ui = always
-	branch = auto
-	diff = auto
-	status = auto
+	ui = true
+	status = always
 
 [help]
 	autocorrect = 1
@@ -84,3 +91,6 @@
 [merge]
 	conflictstyle = diff3
 	stat = true
+
+[pack]
+	useSparse = true

@@ -91,13 +91,13 @@ run_module() {
 # Main setup function
 main() {
     local modules=(
-        "base"          # Basic system configuration
-        "network"       # Static IP and network setup
-        "docker"        # Docker installation and configuration
+        # "base"          # Basic system configuration
+        # "network"       # Static IP and network setup
+        # "docker"        # Docker installation and configuration
         "tools"         # Development tools (git, vim, etc.)
-        "python"        # Python development environment (pyenv, pipx)
-        "nodejs"        # Node.js development environment (nvm)
-        "golang"        # Go development environment
+        # "python"        # Python development environment (pyenv, pipx)
+        # "nodejs"        # Node.js development environment (nvm)
+        # "golang"        # Go development environment
         # "gnome"         # GNOME configuration and extensions
         # "dotfiles"      # GNU Stow dotfiles setup
     )
