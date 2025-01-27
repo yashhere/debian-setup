@@ -4,7 +4,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 # Skip network config over ssh
-SKIP_NETWORK=true
+SKIP_NETWORK=false
 
 # Root directory of the setup scripts
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
