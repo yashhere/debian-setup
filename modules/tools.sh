@@ -273,12 +273,12 @@ setup_ai() {
 
 setup_terminal_tools() {
     # superfile
-    if ! command -v superfile &> /dev/null; then
+    if ! command -v spf &> /dev/null; then
         install_from_github "yorukot" "superfile" "spf" "latest" "amd64"
     fi
 
     # lsd
-    if ! command -v superfile &> /dev/null; then
+    if ! command -v lsd &> /dev/null; then
         install_from_github "lsd-rs" "lsd" "lsd" "latest"
     fi
 }

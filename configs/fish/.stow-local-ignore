@@ -1,0 +1,5 @@
+# Ignore specific plugin/generated directories
+.config/fish/completions
+.config/fish/fish_variables
+.config/fish/generated_completions
+.config/fish/conf.d/fisher.fish

@@ -1,1 +1,0 @@
-/home/yash/.asdf/completions/asdf.fish

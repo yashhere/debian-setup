@@ -6,7 +6,7 @@ set -g fish_greeting
 
 # Install Fisher if it's not installed
 if not functions -q fisher && status is-interactive
-    curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+    curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher update
 end
 
 # Preferred editor for local and remote sessions

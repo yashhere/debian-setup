@@ -25,17 +25,9 @@ log() {
     echo -e "${timestamp} - $1" | tee -a "${LOG_FILE}"
 }
 
-log_error() {
-    log "${RED}ERROR: $1${NC}"
-}
-
-log_success() {
-    log "${GREEN}SUCCESS: $1${NC}"
-}
-
-log_warning() {
-    log "${YELLOW}WARNING: $1${NC}"
-}
+log_error() { log "${RED}ERROR: $1${NC}"; }
+log_success() { log "${GREEN}SUCCESS: $1${NC}"; }
+log_warning() { log "${YELLOW}WARNING: $1${NC}"; }
 
 # Check if running as root
 check_root() {
@@ -47,17 +39,12 @@ check_root() {
 
 # Check if running over SSH
 is_ssh() {
-    if [ -n "${SSH_CLIENT-}" ] || [ -n "${SSH_TTY-}" ]; then
-        return 0
-    else
-        return 1
-    fi
+    [ -n "${SSH_CLIENT-}" ] || [ -n "${SSH_TTY-}" ]
 }
 
 # Check for required commands
 check_requirements() {
     local required_commands=("curl" "git" "sudo")
-
     for cmd in "${required_commands[@]}"; do
         if ! command -v "$cmd" &> /dev/null; then
             log_error "Required command not found: $cmd"
@@ -71,60 +58,68 @@ run_module() {
     local module_name=$1
     local module_path="${MODULES_DIR}/${module_name}.sh"
 
-    if [[ -f "$module_path" ]]; then
-        log "Running module: ${module_name}"
-        source "$module_path"
-        if declare -F "setup_${module_name}" > /dev/null; then
-            "setup_${module_name}"
-            log_success "Module ${module_name} completed"
-        else
-            log_error "Module ${module_name} does not contain required function setup_${module_name}"
-            return 1
-        fi
-    else
+    if [[ ! -f "$module_path" ]]; then
         log_error "Module not found: ${module_path}"
         return 1
     fi
+
+    log "Running module: ${module_name}"
+    source "$module_path"
+
+    if ! declare -F "setup_${module_name}" > /dev/null; then
+        log_error "Module ${module_name} does not contain required function setup_${module_name}"
+        return 1
+    fi
+
+    "setup_${module_name}"
+    log_success "Module ${module_name} completed"
 }
 
+# List available modules
+list_modules() {
+    echo "Available modules:"
+    for module in "${MODULES_DIR}"/*.sh; do
+        [[ -f "$module" ]] || continue
+        basename "$module" .sh
+    done
+}
 
 # Main setup function
 main() {
     local modules=(
-        # "base"          # Basic system configuration
-        # "network"       # Static IP and network setup
-        # "docker"        # Docker installation and configuration
-        "tools"         # Development tools (git, vim, etc.)
-        # "python"        # Python development environment (pyenv, pipx)
-        # "nodejs"        # Node.js development environment (nvm)
-        # "golang"        # Go development environment
+        "base"          # Basic system configuration
+        "network"       # Static IP and network setup
+        "docker"        # Docker installation and configuration
+        "tools"         # Development tools
+        "python"        # Python development environment
+        "nodejs"        # Node.js development environment
+        "golang"        # Go development environment
         # "gnome"         # GNOME configuration and extensions
-        # "dotfiles"      # GNU Stow dotfiles setup
+        "dotfiles"      # GNU Stow dotfiles setup
     )
-
-    # Check if running over SSH and network module is not skipped
-    if is_ssh && ! $SKIP_NETWORK; then
-        log_error "Network configuration cannot be run over SSH!"
-        log_error "Please run network-setup.sh directly on the machine first,"
-        log_error "then run this script again with --skip-network option."
-        exit 1
-    fi
 
     # Create necessary directories
     mkdir -p "${MODULES_DIR}" "${CONFIG_DIR}"
-
-    # Initialize log file
     : > "${LOG_FILE}"
 
     log "Starting Debian setup script"
-
-    # Run preliminary checks
     check_root
     check_requirements
 
-    # Run modules
+    # Run single module if specified
+    if [[ -n "${SINGLE_MODULE:-}" ]]; then
+        run_module "$SINGLE_MODULE"
+        exit $?
+    fi
+
+    # Check SSH conditions
+    if is_ssh && ! $SKIP_NETWORK; then
+        log_error "Network configuration cannot be run over SSH! Use --skip-network option."
+        exit 1
+    fi
+
+    # Run all modules
     for module in "${modules[@]}"; do
-        # Skip network module if specified
         if [ "$module" = "network" ] && $SKIP_NETWORK; then
             log "Skipping network configuration as requested"
             continue
@@ -146,6 +141,18 @@ while [[ $# -gt 0 ]]; do
             SKIP_NETWORK=true
             shift
             ;;
+        --module)
+            SINGLE_MODULE="$2"
+            shift 2
+            ;;
+        --list-modules)
+            list_modules
+            exit 0
+            ;;
+        --help)
+            echo "Usage: $0 [--skip-network] [--module <module_name>] [--list-modules] [--help]"
+            exit 0
+            ;;
         *)
             log_error "Unknown option: $1"
             exit 1
@@ -153,5 +160,4 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Run main function
 main "$@"
