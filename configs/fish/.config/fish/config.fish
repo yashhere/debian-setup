@@ -37,5 +37,3 @@ function yt
     set video_link "$argv[1]"
     fabric -y "$video_link" --transcript
 end
-set -gx PATH $PATH $HOME/.local/bin
-set -gx PATH $PATH $HOME/fabric

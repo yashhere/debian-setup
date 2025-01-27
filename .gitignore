@@ -5,3 +5,4 @@
 *.log
 *.env
 _*.fish
+.aider*

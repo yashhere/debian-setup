@@ -26,11 +26,14 @@ end
 
 # asdf
 source ~/.asdf/asdf.fish
-set -gx PATH $PATH $GOBIN
+fish_add_path $GOBIN
 
 # Bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
+set -gx BUN_INSTALL "$HOME/.bun"
+fish_add_path $BUN_INSTALL
+
+# Local scripts
+fish_add_path $HOME/.local/bin
 
 # FZF and FD helpers for NeoVim
 set -x FZF_DEFAULT_COMMAND "fd --type f"

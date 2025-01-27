@@ -1,5 +1,7 @@
 ## Specify the model to use for the main chat
-model: gemini/gemini-exp-1206
+# model: gemini/gemini-exp-1206
+# model: deepseek/deepseek-reasoner
+model: deepseek/deepseek-chat
 
 ## Enable caching of prompts (default: False)
 cache-prompts: true
