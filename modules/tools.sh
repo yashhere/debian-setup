@@ -30,7 +30,7 @@ install_from_github() {
     local release_data=$(curl -s "$api_url")
     [ $? -ne 0 ] && { echo "Failed to fetch release data"; return 1; }
 
-    local download_url=$(echo "$release_data" | jq -r ".assets[] | select(.browser_download_url | contains(\"$arch\") and contains(\"$OS\")) | .browser_download_url" | head -n1)
+    local download_url=$(echo "$release_data" | jq -r ".assets[] | select(.browser_download_url | ascii_downcase | contains(\"$arch\") and contains(\"$OS\")) | .browser_download_url" | head -n1)
     [ -z "$download_url" ] && { echo "No matching binary found"; return 1; }
 
     local temp_dir=$(mktemp -d)
@@ -280,6 +280,16 @@ setup_terminal_tools() {
     # lsd
     if ! command -v lsd &> /dev/null; then
         install_from_github "lsd-rs" "lsd" "lsd" "latest"
+    fi
+
+    # bat
+    if ! command -v bat &> /dev/null; then
+        install_from_github "sharkdp" "bat" "bat" "latest"
+    fi
+
+    # glow
+    if ! command -v glow &> /dev/null; then
+        install_from_github "charmbracelet" "glow" "glow" "latest"
     fi
 }
 

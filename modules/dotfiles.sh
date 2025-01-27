@@ -8,22 +8,8 @@ setup_dotfiles() {
     # Directory containing the dotfiles
     DOTFILES_DIR="${PARENT_DIR}/configs"
 
-    # List of packages to stow
-    local PACKAGES=(
-        fish
-        git
-        vim
-        aider
-        aichat
-        ssh
-        nvim
-        lsd
-        stow
-        superfile
-        vim
-        vscode
-        xorg
-    )
+    # Get all directories in DOTFILES_DIR
+    PACKAGES=($(find "$DOTFILES_DIR" -mindepth 1 -maxdepth 1 -type d -exec basename {} \;))
 
     # Loop through each package and stow it
     for package in "${PACKAGES[@]}"; do
