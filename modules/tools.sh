@@ -276,6 +276,11 @@ setup_terminal_tools() {
     if ! command -v superfile &> /dev/null; then
         install_from_github "yorukot" "superfile" "spf" "latest" "amd64"
     fi
+
+    # lsd
+    if ! command -v superfile &> /dev/null; then
+        install_from_github "lsd-rs" "lsd" "lsd" "latest"
+    fi
 }
 
 setup_tools() {

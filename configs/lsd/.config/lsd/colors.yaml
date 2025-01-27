@@ -1,0 +1,38 @@
+user: 32  # Green
+group: 64  # Green
+permission:
+  read: 33  # Blue
+  write: 130 # Orange
+  exec: 160 # Red
+  exec-sticky: 167 # Pink
+  no-access: 240 # Medium Gray
+  octal: 240 # Medium Gray
+  acl: 39  # Dark Cyan
+  context: 39 # Dark Cyan
+date:
+  hour-old: 136 # Yellow
+  day-old: 130 # Orange
+  older: 33 # Blue
+size:
+  none: 240 # Medium Gray
+  small: 136 # Yellow
+  medium: 130 # Orange
+  large: 160 # Red
+inode:
+  valid: 33 # Blue
+  invalid: 238 # Dark Gray
+links:
+  valid: 33 # Blue
+  invalid: 238 # Dark Gray
+tree-edge: 240 # Medium Gray
+git-status:
+  default: 238 # Dark Gray
+  unmodified: 240 # Medium Gray
+  ignored: 240 # Medium Gray
+  new-in-index: 32 # Green
+  new-in-workdir: 32  # Green
+  typechange: 130 # Orange
+  deleted: 160 # Red
+  renamed: 33  # Blue
+  modified: 130 # Orange
+  conflicted: 160 # Red

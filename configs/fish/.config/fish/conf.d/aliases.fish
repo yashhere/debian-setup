@@ -40,14 +40,12 @@ if status --is-interactive
     alias rs="exec $SHELL"
     alias pbpaste="xclip -selection clipboard -o"
 
-    if type -q aider
-        alias aider="aider --env-file $HOME/.aider.env"
-    end
+    alias aider="aider --env-file $HOME/.aider.env"
 end
 
-function ls --wraps exa --description "alias ls=exa --git, if installed"
-    if type -q exa
-        exa --git $argv
+function ls --wraps lsd --description "alias ls=lsd"
+    if type -q lsd
+        lsd $argv
     else
         command ls $argv
     end
