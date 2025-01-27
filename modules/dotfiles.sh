@@ -1,6 +1,12 @@
 setup_dotfiles() {
+    # Get the directory of the current script
+    SCRIPT_DIR=$(dirname "$(realpath "${BASH_SOURCE[0]}")")
+
+    # Get the parent directory
+    PARENT_DIR=$(dirname "$SCRIPT_DIR")
+
     # Directory containing the dotfiles
-    DOTFILES_DIR="$HOME/post-install/configs"
+    DOTFILES_DIR="${PARENT_DIR}/configs"
 
     # List of packages to stow
     local PACKAGES=(
