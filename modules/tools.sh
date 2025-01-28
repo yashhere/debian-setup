@@ -297,9 +297,39 @@ setup_terminal_tools() {
         install_from_github "mattn" "docx2md" "docx2md" "latest" "amd64"
     fi
 
-    # thefuncl
+    # thefuck
     if ! command -v thefuck &> /dev/null; then
         pipx install thefuck
+    fi
+
+    # cheat
+    if ! command -v cheat &> /dev/null; then
+        go install github.com/cheat/cheat/cmd/cheat@latest
+    fi
+
+    # tldr
+    if ! command -v tldr &> /dev/null; then
+        npm install -g tldr
+    fi
+
+    # doggo
+    if ! command -v doggo &> /dev/null; then
+        install_from_github "mr-karan" "doggo" "doggo" "latest"
+    fi
+
+    # dust
+    if ! command -v dust &> /dev/null; then
+        install_from_github "bootandy" "dust" "dust" "latest"
+    fi
+
+    # duf
+    if ! command -v duf &> /dev/null; then
+        install_from_github "muesli" "duf" "duf" "latest"
+    fi
+
+    # bottom
+    if ! command -v bottom &> /dev/null; then
+        install_from_github "ClementTsang" "bottom" "btm" "latest"
     fi
 }
 
