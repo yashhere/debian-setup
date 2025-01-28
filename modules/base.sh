@@ -50,6 +50,9 @@ setup_base() {
         pandoc
         silversearcher-ag
         ack
+        zlib1g-dev
+        zlibc
+        libssl-dev
     )
 
     log "Installing base packages..."

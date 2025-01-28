@@ -238,14 +238,14 @@ setup_neovim() {
         log "Installing Neovim..."
 
         sudo apt remove neovim
-        sudo apt install ninja-build gettext cmake unzip curl
+        sudo apt install -y ninja-build gettext cmake unzip curl
 
         # Compile and install Neovim
         git clone https://github.com/neovim/neovim /tmp/neovim
         cd /tmp/neovim
         make CMAKE_BUILD_TYPE=RelWithDebInfo
         cd build && cpack -G DEB
-        sudo dpkg -i --force-overwrite nvim-linux64.deb
+        sudo dpkg -i --force-overwrite nvim-linux*.deb
 
         # Clean up
         cd

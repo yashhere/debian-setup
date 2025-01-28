@@ -42,15 +42,49 @@ is_ssh() {
     [ -n "${SSH_CLIENT-}" ] || [ -n "${SSH_TTY-}" ]
 }
 
-# Check for required commands
+# Check for required commands and install if missing
 check_requirements() {
     local required_commands=("curl" "git" "sudo")
+    local missing_commands=()
+
     for cmd in "${required_commands[@]}"; do
         if ! command -v "$cmd" &> /dev/null; then
-            log_error "Required command not found: $cmd"
-            exit 1
+            missing_commands+=("$cmd")
         fi
     done
+
+    if [ ${#missing_commands[@]} -ne 0 ]; then
+        log_warn "Installing missing commands: ${missing_commands[*]}"
+
+        # Ensure apt update runs first
+        if ! sudo apt-get update; then
+            log_error "Failed to update package lists"
+            exit 1
+        }
+
+        # Install missing commands
+        for cmd in "${missing_commands[@]}"; do
+            case $cmd in
+                "curl")
+                    sudo apt-get install -y curl
+                    ;;
+                "git")
+                    sudo apt-get install -y git
+                    ;;
+                "sudo")
+                    apt-get install -y sudo
+                    ;;
+            esac
+
+            # Verify installation
+            if ! command -v "$cmd" &> /dev/null; then
+                log_error "Failed to install: $cmd"
+                exit 1
+            fi
+        done
+
+        log_info "Successfully installed all required commands"
+    fi
 }
 
 # Function to source and run a module
