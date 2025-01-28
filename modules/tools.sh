@@ -291,6 +291,16 @@ setup_terminal_tools() {
     if ! command -v glow &> /dev/null; then
         install_from_github "charmbracelet" "glow" "glow" "latest"
     fi
+
+    # docx2md
+    if ! command -v docx2md &> /dev/null; then
+        install_from_github "mattn" "docx2md" "docx2md" "latest" "amd64"
+    fi
+
+    # thefuncl
+    if ! command -v thefuck &> /dev/null; then
+        pipx install thefuck
+    fi
 }
 
 setup_tools() {

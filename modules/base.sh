@@ -48,6 +48,8 @@ setup_base() {
         ethtool
         poppler-utils       # pdftotext
         pandoc
+        silversearcher-ag
+        ack
     )
 
     log "Installing base packages..."
