@@ -16,6 +16,7 @@ setup_python() {
         pre-commit
         pytest
         jupyterlab
+        thefuck
     )
 
     for tool in "${python_tools[@]}"; do

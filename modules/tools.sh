@@ -141,9 +141,9 @@ install_fabric() {
 setup_asdf() {
     if ! command -v asdf &> /dev/null; then
         # Python build dependencies
-        sudo apt install -y build-essential libssl-dev zlib1g-dev \
-        libbz2-dev libreadline-dev libsqlite3-dev curl git \
-        libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+        sudo apt install -y build-essential python3-dev libssl-dev zlib1g-dev \
+        libbz2-dev libreadline-dev libsqlite3-dev curl git libffi-dev \
+        libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev liblzma-dev
 
         git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch ${ASDF_VERSION}
 
@@ -300,11 +300,6 @@ setup_terminal_tools() {
     # docx2md
     if ! command -v docx2md &> /dev/null; then
         install_from_github "mattn" "docx2md" "docx2md" "latest" "amd64"
-    fi
-
-    # thefuck
-    if ! command -v thefuck &> /dev/null; then
-        pipx install thefuck
     fi
 
     # cheat
