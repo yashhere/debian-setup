@@ -8,6 +8,7 @@ INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/bin}"
 GITHUB_API_URL="https://api.github.com"
 ARCH="${ARCH:-x86_64}"
 OS="${OS:-linux}"
+INFLUXDB_HOST="${INFLUXDB_HOST:-localhost}"
 
 install_from_github() {
     local owner="$1"
@@ -338,6 +339,94 @@ setup_terminal_tools() {
     fi
 }
 
+setup_telegraf() {
+    # Verify required environment variables
+    if [ -z "$INFLUXDB_HOST" ] || [ -z "$INFLUXDB_TOKEN" ]; then
+        echo "Error: Required environment variables not set"
+        echo "Please set: INFLUXDB_HOST, INFLUXDB_TOKEN"
+        return 1
+    fi
+
+    # Add InfluxDB repository
+    if [ ! -f "/etc/apt/sources.list.d/influxdata.list" ]; then
+        curl -fsSL https://repos.influxdata.com/influxdata-archive_compat.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg > /dev/null
+        echo "deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg] https://repos.influxdata.com/debian stable main" | sudo tee /etc/apt/sources.list.d/influxdata.list
+    fi
+
+    # Update and install
+    sudo apt-get update
+    sudo apt-get install -y telegraf
+
+    # Backup original config
+    sudo cp /etc/telegraf/telegraf.conf /etc/telegraf/telegraf.conf.bak
+
+    # Create new configuration
+    cat << EOF | sudo tee /etc/telegraf/telegraf.conf
+[global_tags]
+os = "Linux"
+
+[agent]
+interval = "10s"
+round_interval = true
+metric_batch_size = 1000
+metric_buffer_limit = 10000
+collection_jitter = "0s"
+flush_interval = "10s"
+flush_jitter = "0s"
+precision = ""
+hostname = ""
+omit_hostname = false
+
+[[outputs.influxdb_v2]]
+urls = ["http://${INFLUXDB_HOST}:8086"]
+token = "${INFLUXDB_TOKEN}"
+organization = "homelab"
+bucket = "homelab"
+user_agent = "telegraf"
+insecure_skip_verify = true
+
+[[inputs.cpu]]
+percpu = true
+totalcpu = true
+collect_cpu_time = false
+report_active = false
+
+[[inputs.disk]]
+ignore_fs = ["tmpfs", "devtmpfs", "devfs", "iso9660", "overlay", "aufs", "squashfs"]
+mount_points = ["/", "/home", "/data"]
+
+[[inputs.diskio]]
+
+[[inputs.mem]]
+
+[[inputs.system]]
+
+[[inputs.processes]]
+
+# System Uptime
+[[inputs.system]]
+  fieldpass = ["uptime"]
+
+# Linux Sysctl (for advanced metrics, be cautious)
+[[inputs.kernel]]
+  # No configuration needed for basic kernel metrics.
+
+# Kernel vmstat metrics
+[[inputs.kernel_vmstat]]
+
+# Sensors (if you have lm-sensors installed and configured)
+[[inputs.sensors]]
+  # No configuration needed for basic sensor data.
+
+[[inputs.net]]
+interfaces = ["eno1", "wlo1"]
+EOF
+
+    # Start and enable service
+    sudo systemctl enable telegraf
+    sudo systemctl start telegraf
+}
+
 setup_tools() {
     log "Starting common tools setup..."
 
@@ -346,6 +435,7 @@ setup_tools() {
     setup_neovim
     setup_ai
     setup_terminal_tools
+    setup_telegraf
 
     log "Common tools setup completed successfully!"
 }

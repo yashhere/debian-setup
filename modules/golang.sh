@@ -3,12 +3,8 @@
 setup_golang() {
     log "Setting up Go development environment..."
 
-    cat << 'EOF' > "$HOME/.config/fish/conf.d/golang.fish"
-source $HOME/.asdf/plugins/golang/set-env.fish
-EOF
-
     # Source the configuration
-    fish -c "source \"$HOME/.config/fish/conf.d/golang.fish\""
+    fish -c "source \"$HOME/.asdf/plugins/golang/set-env.fish\""
 
     # Install common Go tools
     GO_TOOLS=(

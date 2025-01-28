@@ -42,11 +42,3 @@ if status --is-interactive
 
     alias aider="aider --env-file $HOME/.aider.env"
 end
-
-function ls --wraps lsd --description "alias ls=lsd"
-    if type -q lsd
-        lsd $argv
-    else
-        command ls $argv
-    end
-end

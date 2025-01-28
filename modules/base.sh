@@ -53,6 +53,7 @@ setup_base() {
         zlib1g-dev
         zlibc
         libssl-dev
+        lm-sensors
     )
 
     log "Installing base packages..."

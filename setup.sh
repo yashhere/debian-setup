@@ -132,6 +132,16 @@ main() {
         "dotfiles"      # GNU Stow dotfiles setup
     )
 
+    # setup.sh
+    if [ -f .env ]; then
+        set -a  # automatically export all variables
+        source .env
+        set +a
+    else
+        echo "Error: .env file not found"
+        exit 1
+    fi
+
     # Create necessary directories
     mkdir -p "${MODULES_DIR}" "${CONFIG_DIR}"
     : > "${LOG_FILE}"
