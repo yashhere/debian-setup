@@ -33,7 +33,13 @@ setup_gnome() {
     declare -A extensions=(
         ["clipboard-indicator@tudmotu.com"]="https://github.com/Tudmotu/gnome-shell-extension-clipboard-indicator.git"
         ["dash-to-dock"]="https://github.com/micheleg/dash-to-dock.git"
-        ["system-monitor"]="https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet"
+        ["just-perfection"]=" https://gitlab.gnome.org/jrahmatzadeh/just-perfection"
+        ["blur-my-shell"]="https://github.com/aunetx/blur-my-shell"
+        ["gnome-ui-tune"]="https://github.com/axxapy/gnome-ui-tune"
+        ["media-controls"]="https://github.com/cliffniff/media-controls"
+        ["vitals"]="https://github.com/corecoding/Vitals"
+        ["gnome-compact-top-bar"]="https://github.com/metehan-arslan/gnome-compact-top-bar"
+        ["rounded-window-corners"]="https://github.com/flexagoon/rounded-window-corners"
     )
 
     # Set extensions directory
