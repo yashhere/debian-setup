@@ -307,9 +307,9 @@ setup_terminal_tools() {
         go install github.com/cheat/cheat/cmd/cheat@latest
     fi
 
-    # tldr
-    if ! command -v tldr &> /dev/null; then
-        npm install -g tldr
+    # tealdeer
+    if ! command -v tealdeer &> /dev/null; then
+        install_from_github "tealdeer-rs" "tealdeer" "tealdeer" "latest"
     fi
 
     # doggo
@@ -328,8 +328,13 @@ setup_terminal_tools() {
     fi
 
     # bottom
-    if ! command -v bottom &> /dev/null; then
+    if ! command -v btm &> /dev/null; then
         install_from_github "ClementTsang" "bottom" "btm" "latest"
+    fi
+
+    # gron
+    if ! command -v gron &> /dev/null; then
+        install_from_github "tomnomnom" "gron" "gron" "latest" "amd64"
     fi
 }
 
