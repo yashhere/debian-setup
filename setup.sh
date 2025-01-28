@@ -94,7 +94,7 @@ main() {
         "python"        # Python development environment
         "nodejs"        # Node.js development environment
         "golang"        # Go development environment
-        # "gnome"         # GNOME configuration and extensions
+        "gnome"         # GNOME configuration and extensions
         "dotfiles"      # GNU Stow dotfiles setup
     )
 
