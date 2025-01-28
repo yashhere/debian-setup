@@ -60,7 +60,7 @@ check_requirements() {
         if ! sudo apt-get update; then
             log_error "Failed to update package lists"
             exit 1
-        }
+        fi
 
         # Install missing commands
         for cmd in "${missing_commands[@]}"; do

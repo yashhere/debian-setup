@@ -140,6 +140,11 @@ install_fabric() {
 
 setup_asdf() {
     if ! command -v asdf &> /dev/null; then
+        # Python build dependencies
+        sudo apt install -y build-essential libssl-dev zlib1g-dev \
+        libbz2-dev libreadline-dev libsqlite3-dev curl git \
+        libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+
         git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch ${ASDF_VERSION}
 
         # Fish config
