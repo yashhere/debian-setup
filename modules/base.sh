@@ -54,6 +54,7 @@ setup_base() {
         zlibc
         libssl-dev
         lm-sensors
+        sqlite3
     )
 
     log "Installing base packages..."

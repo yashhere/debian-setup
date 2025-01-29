@@ -357,13 +357,15 @@ setup_telegraf() {
     sudo apt-get update
     sudo apt-get install -y telegraf
 
+    # required by ping plugin
+    sudo setcap cap_net_raw=eip /usr/bin/telegraf
+
     # Backup original config
     sudo cp /etc/telegraf/telegraf.conf /etc/telegraf/telegraf.conf.bak
 
     # Create new configuration
     cat << EOF | sudo tee /etc/telegraf/telegraf.conf
 [global_tags]
-os = "Linux"
 
 [agent]
 interval = "10s"
@@ -420,6 +422,17 @@ mount_points = ["/", "/home", "/data"]
 
 [[inputs.net]]
 interfaces = ["eno1", "wlo1"]
+
+[[inputs.ping]]
+  urls = ["8.8.8.8", "1.1.1.1"]
+  method = "native"
+  interface = "eno1"
+  ping_interval = 1.0
+  timeout = 1.0
+  interval = "30s"
+  count = 3
+  percentiles = [50, 95, 99]
+
 EOF
 
     # Start and enable service
