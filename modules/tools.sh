@@ -355,10 +355,44 @@ setup_telegraf() {
 
     # Update and install
     sudo apt-get update
-    sudo apt-get install -y telegraf
+    sudo apt-get install -y telegraf acpi
+
+    # Create battery monitoring script
+    if [ ! -f "/etc/telegraf/battery_monitor.sh" ]; then
+        cat << 'BATTERYSCRIPT' | sudo tee /etc/telegraf/battery_monitor.sh
+#!/bin/bash
+
+# Get battery info using acpi
+battery_info=$(acpi -b)
+
+# Extract percentage
+percentage=$(echo "$battery_info" | grep -oP '\d+(?=%)' || echo "0")
+
+# Extract charging status
+if echo "$battery_info" | grep -q "Charging"; then
+    status="charging"
+elif echo "$battery_info" | grep -q "Discharging"; then
+    status="discharging"
+elif echo "$battery_info" | grep -q "Full"; then
+    status="full"
+else
+    status="unknown"
+fi
+
+# Extract time remaining if available
+time_remaining=$(echo "$battery_info" | grep -oP '\d+:\d+:\d+' || echo "00:00:00")
+
+# Output in InfluxDB line protocol format
+echo "laptop_battery,host=$(hostname) percentage=$percentage,status=\"$status\",time_remaining=\"$time_remaining\""
+BATTERYSCRIPT
+
+        sudo chmod +x /etc/telegraf/battery_monitor.sh
+    fi
 
     # required by ping plugin
     sudo setcap cap_net_raw=eip /usr/bin/telegraf
+    # required by docker plugin
+    sudo usermod -aG docker telegraf
 
     # Backup original config
     sudo cp /etc/telegraf/telegraf.conf /etc/telegraf/telegraf.conf.bak
@@ -405,16 +439,24 @@ mount_points = ["/", "/home", "/data"]
 
 [[inputs.processes]]
 
-# System Uptime
-[[inputs.system]]
-  fieldpass = ["uptime"]
+# # Collect statistics about itself
+[[inputs.internal]]
+
+# # This plugin gathers interrupts data from /proc/interrupts and /proc/softirqs.
+[[inputs.interrupts]]
 
 # Linux Sysctl (for advanced metrics, be cautious)
 [[inputs.kernel]]
-  # No configuration needed for basic kernel metrics.
+
+# # Provides Linux sysctl fs metrics
+[[inputs.linux_sysctl_fs]]
 
 # Kernel vmstat metrics
 [[inputs.kernel_vmstat]]
+
+# # Get kernel statistics from /proc/mdstat
+# # This plugin ONLY supports Linux
+[[inputs.mdstat]]
 
 # Sensors (if you have lm-sensors installed and configured)
 [[inputs.sensors]]
@@ -423,8 +465,14 @@ mount_points = ["/", "/home", "/data"]
 [[inputs.net]]
 interfaces = ["eno1", "wlo1"]
 
+# # Read TCP metrics such as established, time wait and sockets counts.
+[[inputs.netstat]]
+
+# # Collect kernel snmp counters and network interface statistics
+[[inputs.nstat]]
+
 [[inputs.ping]]
-  urls = ["8.8.8.8", "1.1.1.1"]
+  urls = ["8.8.8.8", "1.1.1.1", "192.168.1.1"]
   method = "native"
   interface = "eno1"
   ping_interval = 1.0
@@ -433,10 +481,40 @@ interfaces = ["eno1", "wlo1"]
   count = 3
   percentiles = [50, 95, 99]
 
+[[inputs.http_response]]
+urls = ["https://google.com", "https://yashagarwal.in"]
+response_timeout = "10s"
+follow_redirects = true
+
+[[inputs.dns_query]]
+servers = ["8.8.8.8", "1.1.1.1", "9.9.9.9"]
+
+[[inputs.docker]]
+endpoint = "unix:///var/run/docker.sock"
+source_tag = true
+timeout = "5s"
+total = false
+perdevice = false
+gather_services = false
+docker_label_include = [
+    "com.docker.compose.config-hash",
+    "com.docker.compose.container-number",
+    "com.docker.compose.oneoff",
+    "com.docker.compose.project",
+    "com.docker.compose.service",
+]
+
+[[inputs.exec]]
+  commands = ["/etc/telegraf/battery_monitor.sh"]
+  timeout = "5s"
+  data_format = "influx"
+  interval = "30s"
+
 EOF
 
     # Start and enable service
     sudo systemctl enable telegraf
+    sudo systemctl stop telegraf
     sudo systemctl start telegraf
 }
 
