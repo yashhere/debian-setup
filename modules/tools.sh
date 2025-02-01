@@ -167,6 +167,9 @@ EOF
         fish -c 'asdf plugin add nodejs'
         fish -c 'asdf install nodejs latest'
         fish -c 'asdf global nodejs latest'
+        fish -c 'asdf plugin add bun'
+        fish -c 'asdf install bun latest'
+        fish -c 'asdf global bun latest'
 
         fish -c 'asdf plugin add golang'
         fish -c 'asdf install golang 1.23.5'
