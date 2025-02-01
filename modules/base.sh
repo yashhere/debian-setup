@@ -55,6 +55,7 @@ setup_base() {
         libssl-dev
         lm-sensors
         sqlite3
+        git-filter-repo
     )
 
     log "Installing base packages..."

@@ -31,7 +31,7 @@ install_from_github() {
     local release_data=$(curl -s "$api_url")
     [ $? -ne 0 ] && { echo "Failed to fetch release data"; return 1; }
 
-    local download_url=$(echo "$release_data" | jq -r ".assets[] | select(.browser_download_url | ascii_downcase | contains(\"$arch\") and contains(\"$OS\")) | .browser_download_url" | head -n1)
+    local download_url=$(echo "$release_data" | jq -r ".assets[] | select(.browser_download_url | ascii_downcase | contains(\"$arch\") and contains(\"$OS\") and (endswith(\".tar.gz\") or endswith(\".zip\"))) | .browser_download_url" | head -n1)
     [ -z "$download_url" ] && { echo "No matching binary found"; return 1; }
 
     local temp_dir=$(mktemp -d)
@@ -47,17 +47,17 @@ install_from_github() {
     case "$download_url" in
         *.tar.gz|*.tgz)
             tar xzf "$archive" -C "$temp_dir"
-            ;;
+        ;;
         *.tar)
             tar xf "$archive" -C "$temp_dir"
-            ;;
+        ;;
         *.zip)
             unzip -q "$archive" -d "$temp_dir"
-            ;;
+        ;;
         *)
             # Direct binary download
             mv "$archive" "$temp_dir/$binary"
-            ;;
+        ;;
     esac
 
     # Find and move the binary
@@ -340,6 +340,33 @@ setup_terminal_tools() {
     if ! command -v gron &> /dev/null; then
         install_from_github "tomnomnom" "gron" "gron" "latest" "amd64"
     fi
+
+    # gh-cli
+    if ! command -v gh &> /dev/null; then
+        install_from_github "cli" "cli" "gh" "latest" "amd64"
+    fi
+}
+
+setup_gh_commit() {
+    if ! command -v gh > /dev/null 2>&1
+    then
+        log "GitHub CLI could not be found. Can't install gh-commit!"
+        return 0
+    fi
+
+    # Check if the extension is already installed
+    if gh extension list | grep -q "gh-commit"; then
+        log "gh-commit extension is already installed.\n"
+        return 1
+    fi
+
+    # Install GitHub CLI extension
+    gh extension install ghcli/gh-commit
+
+    # Create Git alias (POSIX compliant)
+    git config --global alias.auto-commit '!f() { git commit -m "$(gh commit)" || git commit -a -m "$(gh commit)" && git log HEAD...HEAD~1; }; f'
+
+    log "Commit GitHub CLI extension installed successfully!"
 }
 
 setup_telegraf() {
@@ -530,6 +557,7 @@ setup_tools() {
     setup_ai
     setup_terminal_tools
     setup_telegraf
+    setup_gh_commit
 
     log "Common tools setup completed successfully!"
 }
