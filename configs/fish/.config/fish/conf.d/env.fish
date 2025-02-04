@@ -3,7 +3,7 @@
 # Handle both quoted and unquoted values
 
 if test -f ~/.env
-    for line in (cat ~/.env)
+    for line in (command cat ~/.env)
         # Skip empty lines and comments
         if test -n "$line" && not string match -q "#*" $line
             # Split on first = only
