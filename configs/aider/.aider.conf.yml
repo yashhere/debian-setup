@@ -1,5 +1,6 @@
 ## Specify the model to use for the main chat
 # model: gemini/gemini-exp-1206
+# model: gemini/gemini-2.0-flash-thinking-exp-01-21
 # model: deepseek/deepseek-reasoner
 model: deepseek/deepseek-chat
 # model: openrouter/deepseek/deepseek-r1:free
@@ -15,3 +16,46 @@ dirty-commits: false
 
 ## Permanently disable analytics
 analytics-disable: true
+
+## Use colors suitable for a light terminal background (default: False)
+light-mode: true
+
+## Set the color for user input (default: #00cc00)
+# Catppuccin Latte Green
+user-input-color: '#40a02b'  # latte-green
+
+## Set the color for tool output (default: None)
+# Catppuccin Latte Text (slightly muted but readable)
+tool-output-color: '#4c4f69' # latte-text
+
+## Set the color for tool error messages (default: #FF2222)
+# Catppuccin Latte Red
+tool-error-color: '#ea494a'  # latte-red
+
+## Set the color for tool warning messages (default: #FFA500)
+# Catppuccin Latte Peach (softer than orange, good for warnings)
+tool-warning-color: '#ff8f40' # latte-peach
+
+## Set the color for assistant output (default: #0088ff)
+# Catppuccin Latte Blue
+assistant-output-color: '#1e66f5' # latte-blue
+
+## Set the color for the completion menu (default: terminal's default text color)
+# Catppuccin Latte Text
+completion-menu-color: '#4c4f69' # latte-text
+
+## Set the background color for the completion menu (default: terminal's default background color)
+# Catppuccin Latte Surface0 (very light background)
+completion-menu-bg-color: '#eff1f5' # latte-surface0
+
+## Set the color for the current item in the completion menu (default: terminal's default background color)
+# Catppuccin Latte Text (for foreground of selected item)
+completion-menu-current-color: '#4c4f69' # latte-text
+
+## Set the background color for the current item in the completion menu (default: terminal's default text color)
+# Catppuccin Latte Surface2 (slightly darker than Surface0 to highlight)
+completion-menu-current-bg-color: '#d9e0ee' # latte-surface2
+
+## Set the markdown code theme (default: default, other options include monokai, solarized-dark, solarized-light, or a Pygments builtin style, see https://pygments.org/styles for available themes)
+# Solarized Light is a good choice for light themes
+code-theme: solarized-light
