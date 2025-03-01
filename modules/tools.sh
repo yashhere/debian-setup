@@ -502,7 +502,7 @@ interfaces = ["eno1", "wlo1"]
 [[inputs.nstat]]
 
 [[inputs.ping]]
-  urls = ["8.8.8.8", "1.1.1.1", "192.168.1.1", "192.168.1.141"]
+  urls = ["8.8.8.8", "1.1.1.1", "192.168.1.1"]
   method = "native"
   interface = "eno1"
   ping_interval = 1.0
@@ -517,7 +517,7 @@ response_timeout = "10s"
 follow_redirects = true
 
 [[inputs.dns_query]]
-servers = ["8.8.8.8", "1.1.1.1", "9.9.9.9", "192.168.1.141"]
+servers = ["8.8.8.8", "1.1.1.1", "9.9.9.9"]
 
 [[inputs.docker]]
 endpoint = "unix:///var/run/docker.sock"

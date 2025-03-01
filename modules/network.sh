@@ -56,12 +56,12 @@ validate_network_settings() {
 
 # Main network configuration function
 configure_network() {
-    # Network configuration parameters - MODIFY THESE
-    local IP_ADDRESS="192.168.1.126/24"  # Change this to your desired IP
-    local GATEWAY="192.168.1.1"          # Change this to your gateway
-    local DNS1="1.1.1.1"
-    local DNS2="9.9.9.9"
-    local INTERFACE="eno1"               # Change this to your interface name
+    # Network configuration parameters
+    local IP_ADDRESS="192.168.1.102/24"
+    local GATEWAY="192.168.1.1"
+    local DNS1="192.168.1.101"
+    local DNS2="1.1.1.1"
+    local INTERFACE="eno1"
 
     # Validate settings
     if ! validate_network_settings "$IP_ADDRESS" "$GATEWAY" "$INTERFACE"; then
@@ -284,7 +284,7 @@ prefix_to_netmask() {
             netmask+="255"
             prefix=$((prefix - 8))
         else
-            netmask+=$((256 - (1 << (8 - prefix))))
+            netmask+=$((256 - 2**(8 - prefix)))
             prefix=0
         fi
 
